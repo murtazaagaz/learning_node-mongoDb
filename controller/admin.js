@@ -36,6 +36,7 @@ exports.addProductController = async (req, res, next) => {
     price: price,
     image: image,
     description: description,
+    userId : req.user._id,
   });
 
   const result = await products.save();

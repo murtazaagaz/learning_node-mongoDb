@@ -12,11 +12,26 @@ const mongoConnect = require('./utils/database').mongoConnect;
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const User = require('./model/user');
+const { name } = require('ejs');
 
+app.use((req, res, next)=>{
+  
+  User.findById('61295a2244716780bae60eb8').then((user)=>{
+    req.user = new User(user.name, user.email,{id: user._id, cart: user.cart} );
+    // console.log('MUR USERNAME '+ user.name);
+
+req.next();
+  }).catch((err)=>{
+    // console.log('MUR USER ERROR');
+  });
+});
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+
+
 
 app.use(errorController.show404);
 
