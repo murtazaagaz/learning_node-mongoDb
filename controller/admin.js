@@ -1,24 +1,24 @@
-const Product = require('../model/product');
+const Product = require("../model/product");
 
 exports.getProducts = async (req, res, next) => {
   const products = await Product.fetchAll();
 
-  console.log('MUR PRODS:: ', products);
-  res.render('admin/products', {
+  console.log("MUR PRODS:: ", products);
+  res.render("admin/products", {
     prods: products,
-    pageTitle: 'All Products',
-    path: 'admin/products',
+    pageTitle: "All Products",
+    path: "admin/products",
     hasProducts: products.length > 0,
     activeShop: true,
     productCSS: true,
   });
 };
 exports.getAddProductsController = (req, res, next) => {
-  console.log('Mur GET add products');
+  console.log("Mur GET add products");
   // res.json({ hello: 'helo' });
-  res.render('admin/edit-product', {
-    pageTitle: 'Add Product',
-    path: '/admin/add-product',
+  res.render("admin/edit-product", {
+    pageTitle: "Add Product",
+    path: "/admin/add-product",
     editing: false,
   });
 };
@@ -36,11 +36,11 @@ exports.addProductController = async (req, res, next) => {
     price: price,
     image: image,
     description: description,
-    userId : req.user._id,
+    userId: req.user,
   });
 
   const result = await products.save();
-  console.log('Mur post add prod', result);
+  console.log("Mur post add prod", result);
 
   // await req.user.createProduct({
   //   title: title,
@@ -53,7 +53,7 @@ exports.addProductController = async (req, res, next) => {
   // });
 
   // res.json({ result: true });
-  res.redirect('/products');
+  res.redirect("/products");
 };
 
 exports.getEditProductsController = async (req, res, next) => {
@@ -62,9 +62,9 @@ exports.getEditProductsController = async (req, res, next) => {
   const productId = req.params.productId;
   const product = await Product.findById(productId);
   if (product) {
-    res.render('admin/edit-product', {
-      pageTitle: 'Edit Product',
-      path: '/admin/edit-product',
+    res.render("admin/edit-product", {
+      pageTitle: "Edit Product",
+      path: "/admin/edit-product",
       editing: true,
       product: product,
     });
@@ -78,31 +78,28 @@ exports.postEditingController = async (req, res, next) => {
   const description = req.body.description;
   const image = req.body.image;
 
-  const product = new Product({
-    id: id,
-    title: title,
-    price: price,
-    description: description,
-    image: image,
-  });
+  const product = await Product.findById(id);
+  product.title = title;
+  product.description = description;
+  product.image = image;
+  product.price = price;
 
   await product.save();
 
-  res.redirect('/products');
+  res.redirect("/products");
 };
 
 exports.postDeleteProduct = async (req, res, next) => {
-  const product = new Product({ id: req.body.id });
-  await product.delete();
+  await Product.findByIdAndRemove(req.body.id);
 
-  res.redirect('/products');
+  res.redirect("/products");
 };
 exports.products = getIndex = (req, res, next) => {
   req.user.getProducts().then((products) => {
-    res.render('admin/products', {
+    res.render("admin/products", {
       prods: products,
-      pageTitle: 'Shop',
-      path: '/admin/products',
+      pageTitle: "Shop",
+      path: "/admin/products",
       hasProducts: products.length > 0,
       activeShop: true,
       productCSS: true,
