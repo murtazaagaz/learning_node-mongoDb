@@ -13,7 +13,10 @@
 
         <p><%= product.description %></p>
 
+        <% if (isLoggedIn == 'true') { %>
+
        <%- include('../includes/addToCart.ejs', {product: product}) %>
 
+       <%}%>
     </main>
 <%- include('../includes/end.ejs') %>

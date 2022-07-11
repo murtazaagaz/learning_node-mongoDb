@@ -2,9 +2,11 @@ const express = require("express");
 
 const router = express.Router();
 const adminController = require("../controller/admin");
+const isAuth = require("../middlewares/is-auth");
 
 // /admin/add-product => GET
-// router.get('/products', adminController.getProducts);
+router.use(isAuth);
+router.get("/products", adminController.getProducts);
 
 router.get("/add-product", adminController.getAddProductsController);
 
@@ -18,7 +20,7 @@ router.get(
 
 router.post("/edit-product", adminController.postEditingController);
 
-router.post('/delete-product', adminController.postDeleteProduct);
+router.post("/delete-product", adminController.postDeleteProduct);
 
 // // /admin/products
 // router.get('/products', adminController.products);

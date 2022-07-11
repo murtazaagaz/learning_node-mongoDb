@@ -8,7 +8,7 @@ exports.getProducts = async (req, res, next) => {
   const products = await Product.find();
   // .select("name image price")
   // .populate("userId", "name");
-  console.log("MUR PRODS:: ", products);
+  const isLoggedIn = req.session.isLoggedIn;
   res.render("shop/product-list", {
     prods: products,
     pageTitle: "All Products",
@@ -16,28 +16,27 @@ exports.getProducts = async (req, res, next) => {
     hasProducts: products.length > 0,
     activeShop: true,
     productCSS: true,
+    isLoggedIn: isLoggedIn,
   });
 };
 
 exports.getProduct = async (req, res, next) => {
   let id = req.params.productId;
 
+  const isLoggedIn = req.session.isLoggedIn;
   const product = await Product.findById(id);
-
-  console.log("MUR PROD BY ID :: ", product);
+  const user = req.user;
   res.render("shop/product-detail", {
     product: product,
     pageTitle: product,
     path: "/products",
+    isLoggedIn: isLoggedIn,
   });
 };
 exports.getIndex = async (req, res, next) => {
   const products = await Product.find();
 
-  // res.json({
-  //   result: true,
-  //   data: products,
-  // });
+  const isLoggedIn = req.session.isLoggedIn;
   res.render("shop/index", {
     prods: products,
     pageTitle: "Shop",
@@ -45,28 +44,28 @@ exports.getIndex = async (req, res, next) => {
     hasProducts: products.length > 0,
     activeShop: true,
     productCSS: true,
+    isLoggedIn: isLoggedIn,
   });
 };
 exports.getCart = async (req, res, next) => {
+  const isLoggedIn = req.session.isLoggedIn;
+
   const user = await req.user.populate("cart.items.productId");
   const products = user.cart.items;
 
-  // res.send(JSON.stringify(products));
-  // return;
   res.render("shop/cart", {
     prods: products,
     pageTitle: "cart",
     path: "/cart",
     products: products,
+    isLoggedIn: isLoggedIn,
   });
 };
 
 exports.postCart = async (req, res, next) => {
   let productId = req.body.productId;
 
-  console.log("MUR PRODUCT_ID:: ", productId);
   const product = await Product.findById(productId);
-
   await req.user.addToCart(product);
   res.redirect("/cart");
 };
@@ -87,11 +86,14 @@ exports.deleteCart = async (req, res, nex) => {
 //   });
 // };
 exports.getCheckout = (req, res, next) => {
+  const isLoggedIn = false;
+
   Product.fetchAll((products) => {
     res.render("shop/checkout", {
       prods: products,
       pageTitle: "Checkout",
       path: "/checkout",
+      isLoggedIn: isLoggedIn,
     });
   });
 };
@@ -99,8 +101,6 @@ exports.getCheckout = (req, res, next) => {
 exports.createOrder = async (req, res, next) => {
   const user = await req.user.populate("cart.items.productId");
   const products = user.cart.items.map((p) => {
-    console.log("order");
-
     let product = { ...p.productId._doc };
     product.quantity = p.quantity;
     return product;

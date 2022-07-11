@@ -12,62 +12,52 @@ app.set("view engine", "ejs");
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 const { name } = require("ejs");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+
+const MONGO_DB_URI =
+  "mongodb+srv://murtazaagaz:12345665@cluster0.th8vy.mongodb.net/myFirstDatabase";
+const store = new MongoDBStore({ uri: MONGO_DB_URI, collection: "session" });
+
+app.use(
+  session({
+    secret: "My name is Murtaza",
+    resave: false,
+    store: store,
+    saveUninitialized: false,
+  })
+);
+
+app.use(async (req, res, next) => {
+  if (req.session.user) {
+
+    const user = await User.findById(req.session.user._id);
+
+    req.user = user;
+  } else {
+  }
+  next();
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use((req, res, next) => {
-  User.findById("62547461da7a21039af7ae8b")
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((e) => {
-      console.log("MUR", e);
-    });
-});
+app.use(authRoutes);
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.show404);
 
-// mongoConnect().then((cl)=>{});
-
 mongoose
-  .connect(
-    "mongodb+srv://murtazaagaz:12345665@cluster0.th8vy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-  )
+  .connect(MONGO_DB_URI)
   .then((result) => {
-    console.log("MUR APP START");
+    console.log("***APP START***");
 
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "Murtaza Agaz ",
-          email: "murtaza@gmail.com",
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
     app.listen(3000);
   })
   .catch((e) => {
-    console.log("MUR APP START ERROR", e);
   });
-// mongoConnect(() => {
-// });
-
-// const instantiateSQL = async () => {
-//   Product.belongsTo(User, { constraint: true, onDelete: 'CASCADE' });
-//   await sequelize.sync({ force: true });
-
-//   const user = await Users.findByPk(1);
-//   if (!user) {
-//     await Users.create({ name: `Murtaza`, email: `murtaza@gmail.com` });
-//   }
-// };

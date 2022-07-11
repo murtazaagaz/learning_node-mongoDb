@@ -6,6 +6,10 @@ const userSchema = new schema({
     type: String,
     required: true,
   },
+  password: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -29,7 +33,6 @@ const userSchema = new schema({
 });
 
 userSchema.methods.addToCart = function (product) {
-  console.log("MUR ADD TO CART1");
   const cartItemIndex = this.cart.items.findIndex((cp) => {
     return cp.productId.toString() === product._id.toString();
   });
@@ -40,10 +43,8 @@ userSchema.methods.addToCart = function (product) {
     currentCart[cartItemIndex].quantity = quantity;
   } else {
     currentCart.push({ productId: product._id, quantity: quantity });
-    console.log("MUR ADD TO CART 3 ", currentCart);
   }
   this.cart.items = currentCart;
-  console.log("MUR ADD TO CART 2 ", this.cart);
 
   return this.save();
 };

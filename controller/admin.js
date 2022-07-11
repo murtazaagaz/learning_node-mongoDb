@@ -2,8 +2,8 @@ const Product = require("../model/product");
 
 exports.getProducts = async (req, res, next) => {
   const products = await Product.fetchAll();
+  const isLoggedIn = false;
 
-  console.log("MUR PRODS:: ", products);
   res.render("admin/products", {
     prods: products,
     pageTitle: "All Products",
@@ -11,15 +11,18 @@ exports.getProducts = async (req, res, next) => {
     hasProducts: products.length > 0,
     activeShop: true,
     productCSS: true,
+    isLoggedIn: isLoggedIn,
   });
 };
 exports.getAddProductsController = (req, res, next) => {
-  console.log("Mur GET add products");
   // res.json({ hello: 'helo' });
+  const isLoggedIn = false;
+
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
+    isLoggedIn: isLoggedIn,
   });
 };
 exports.addProductController = async (req, res, next) => {
@@ -29,7 +32,7 @@ exports.addProductController = async (req, res, next) => {
   const image = req.body.image;
   const price = req.body.price;
   const description = req.body.description;
-  // console.log(`MUR ADMIN CREATE USERID: ${req.user.id}`);
+  const isLoggedIn = false;
 
   const products = new Product({
     title: title,
@@ -37,10 +40,10 @@ exports.addProductController = async (req, res, next) => {
     image: image,
     description: description,
     userId: req.user,
+    isLoggedIn: isLoggedIn,
   });
 
   const result = await products.save();
-  console.log("Mur post add prod", result);
 
   // await req.user.createProduct({
   //   title: title,
@@ -59,6 +62,8 @@ exports.addProductController = async (req, res, next) => {
 exports.getEditProductsController = async (req, res, next) => {
   const edit = req.query.edit;
 
+  const isLoggedIn = false;
+
   const productId = req.params.productId;
   const product = await Product.findById(productId);
   if (product) {
@@ -67,6 +72,7 @@ exports.getEditProductsController = async (req, res, next) => {
       path: "/admin/edit-product",
       editing: true,
       product: product,
+      isLoggedIn: isLoggedIn,
     });
   }
 };
@@ -95,6 +101,8 @@ exports.postDeleteProduct = async (req, res, next) => {
   res.redirect("/products");
 };
 exports.products = getIndex = (req, res, next) => {
+  const isLoggedIn = false;
+
   req.user.getProducts().then((products) => {
     res.render("admin/products", {
       prods: products,
@@ -103,6 +111,7 @@ exports.products = getIndex = (req, res, next) => {
       hasProducts: products.length > 0,
       activeShop: true,
       productCSS: true,
+      isLoggedIn: isLoggedIn,
     });
   });
 };
