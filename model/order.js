@@ -10,7 +10,7 @@ const orderSchema = new schema({
   ],
 
   user: {
-    name: { type: String, required: true },
+    email : { type: String, required: true },
     userId: { type: schema.Types.ObjectId, required: true, ref: "User" },
   },
 });

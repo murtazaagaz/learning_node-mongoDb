@@ -5,22 +5,22 @@ const adminController = require("../controller/admin");
 const isAuth = require("../middlewares/is-auth");
 
 // /admin/add-product => GET
-router.use(isAuth);
-router.get("/products", adminController.getProducts);
+router.get("/products", isAuth, adminController.getProducts);
 
-router.get("/add-product", adminController.getAddProductsController);
+router.get("/add-product", isAuth, adminController.getAddProductsController);
 
 // admin/add-product => POST
-router.post("/add-product", adminController.addProductController);
+router.post("/add-product", isAuth, adminController.addProductController);
 
 router.get(
   "/edit-product/:productId",
+  isAuth,
   adminController.getEditProductsController
 );
 
-router.post("/edit-product", adminController.postEditingController);
+router.post("/edit-product", isAuth, adminController.postEditingController);
 
-router.post("/delete-product", adminController.postDeleteProduct);
+router.post("/delete", isAuth, adminController.postDeleteProduct);
 
 // // /admin/products
 // router.get('/products', adminController.products);

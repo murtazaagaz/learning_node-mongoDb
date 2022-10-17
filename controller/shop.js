@@ -108,7 +108,7 @@ exports.createOrder = async (req, res, next) => {
 
   const order = new Order({
     products: products,
-    user: { name: req.user.name, userId: req.user },
+    user: { email: req.user.email, userId: req.user },
   });
   await order.save();
   await req.user.clearCart();

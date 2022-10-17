@@ -18,9 +18,13 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 
+const csurf = require("csurf");
+const flash = require("connect-flash");
+
 const MONGO_DB_URI =
   "mongodb+srv://murtazaagaz:12345665@cluster0.th8vy.mongodb.net/myFirstDatabase";
 const store = new MongoDBStore({ uri: MONGO_DB_URI, collection: "session" });
+
 
 app.use(
   session({
@@ -31,9 +35,9 @@ app.use(
   })
 );
 
+app.use(flash());
 app.use(async (req, res, next) => {
   if (req.session.user) {
-
     const user = await User.findById(req.session.user._id);
 
     req.user = user;
@@ -42,8 +46,17 @@ app.use(async (req, res, next) => {
   next();
 });
 
+const csrfMiddleWare = csurf();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(csrfMiddleWare);
+
+app.use((req, res, next) => {
+  res.locals.isLoggedIn = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 
 app.use(authRoutes);
 
@@ -59,5 +72,4 @@ mongoose
 
     app.listen(3000);
   })
-  .catch((e) => {
-  });
+  .catch((e) => {});

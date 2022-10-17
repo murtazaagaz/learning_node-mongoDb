@@ -1,12 +1,13 @@
+const { INET } = require("sequelize/types");
 const Product = require("../model/product");
 
 exports.getProducts = async (req, res, next) => {
-  const products = await Product.fetchAll();
+  const products = await Product.find({ userId: req.user._id });
   const isLoggedIn = false;
 
   res.render("admin/products", {
     prods: products,
-    pageTitle: "All Products",
+    pageTitle: "All",
     path: "admin/products",
     hasProducts: products.length > 0,
     activeShop: true,
@@ -15,7 +16,6 @@ exports.getProducts = async (req, res, next) => {
   });
 };
 exports.getAddProductsController = (req, res, next) => {
-  // res.json({ hello: 'helo' });
   const isLoggedIn = false;
 
   res.render("admin/edit-product", {
@@ -26,8 +26,6 @@ exports.getAddProductsController = (req, res, next) => {
   });
 };
 exports.addProductController = async (req, res, next) => {
-  // products.push({ title: req.body.title });
-
   const title = req.body.title;
   const image = req.body.image;
   const price = req.body.price;
@@ -45,17 +43,6 @@ exports.addProductController = async (req, res, next) => {
 
   const result = await products.save();
 
-  // await req.user.createProduct({
-  //   title: title,
-  //   price: price,
-  //   image: image,
-  //   description: description,
-  // });
-  // await req.user.createProduct({
-
-  // });
-
-  // res.json({ result: true });
   res.redirect("/products");
 };
 
@@ -85,6 +72,9 @@ exports.postEditingController = async (req, res, next) => {
   const image = req.body.image;
 
   const product = await Product.findById(id);
+  if (product.userId.toString() !== req.user.userId.toString()) {
+    return res.redirect("/");
+  }
   product.title = title;
   product.description = description;
   product.image = image;
@@ -96,9 +86,9 @@ exports.postEditingController = async (req, res, next) => {
 };
 
 exports.postDeleteProduct = async (req, res, next) => {
-  await Product.findByIdAndRemove(req.body.id);
+  await Product.deleteOne({ _id: req.body.id, userId: req.user.userId });
 
-  res.redirect("/products");
+  res.redirect("/");
 };
 exports.products = getIndex = (req, res, next) => {
   const isLoggedIn = false;

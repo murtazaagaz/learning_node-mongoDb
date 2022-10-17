@@ -8,7 +8,7 @@
 
 
     <main>
-        <form class="login-form" action="/signup" method="POST">
+        <form class="product-form" action="/signup" method="POST">
             <div class="form-control">
                 <label for="name">Name</label>
                 <input type="name" name="name" id="name">
@@ -22,7 +22,13 @@
                 <input type="password" name="password" id="password">
             </div>
            
-            <button class="btn" type="submit">Login</button>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <% if(error){ %>
+                <div> <%= error   %></div>
+            
+                <% } %>
+            <button class="btn" type="submit">Signup</button>
         </form>
     </main>
     <%- include('../includes/end.ejs') %>
