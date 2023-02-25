@@ -1,4 +1,3 @@
-const { INET } = require("sequelize/types");
 const Product = require("../model/product");
 
 exports.getProducts = async (req, res, next) => {
